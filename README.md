@@ -10,6 +10,8 @@ Le site est statique : chaque dossier est servi tel quel.
 
 Depuis la racine du dépôt : `python3 -m unittest` (Python 3 seul, aucune dépendance).
 
+À chaque envoi sur `main`, le workflow `.github/workflows/pages.yml` lance ces tests puis publie le site sur GitHub Pages, uniquement s'ils passent.
+
 ## Licence
 
 Le contenu pédagogique (textes, exercices, livret PDF) est publié sous licence [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr) : réutilisation et modification libres, en citant la source, sans usage commercial et sous la même licence.
