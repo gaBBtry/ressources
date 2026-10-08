@@ -523,7 +523,7 @@ function buildNotion(m, n, k) {
   const out = document.createElement('div'); out.className = 'out'; out.setAttribute('aria-live', 'polite');
   const ed = makeEditor(id, n.code, { onRun: go, label: 'Exemple : ' + n.titre });
   const bar = document.createElement('div'); bar.className = 'bar-act';
-  bar.innerHTML = '<button class="btn primary" data-a="run">▶ Exécuter</button><button class="btn ghost" data-a="reset">Revenir à l\'exemple</button><span class="hint-k"><kbd>Ctrl</kbd>+<kbd>Entrée</kbd></span>';
+  bar.innerHTML = '<button class="btn primary" data-a="run">▶ Exécuter</button><button class="btn ghost" data-a="reset">Revenir à l\'exemple</button><span class="hint-k"><kbd>Ctrl</kbd>+<kbd>Entrée</kbd> · <kbd>Échap</kbd> sort de l\'éditeur</span>';
   async function go() {
     const btn = bar.querySelector('[data-a="run"]'); btn.disabled = true;
     out.innerHTML = '<div class="muted">Exécution…</div>';
@@ -547,7 +547,7 @@ function buildExo(m, e, k) {
   const out = document.createElement('div'); out.className = 'out'; out.setAttribute('aria-live', 'polite');
   const ed = makeEditor(e.id, e.depart, { onRun: () => go('check'), label: 'Ta réponse : ' + e.titre });
   const bar = document.createElement('div'); bar.className = 'bar-act';
-  bar.innerHTML = '<button class="btn check" data-a="check">✓ Vérifier</button><button class="btn" data-a="run">▶ Exécuter</button><button class="btn ghost" data-a="hint">Indice</button><button class="btn ghost" data-a="sol">Solution</button><button class="btn ghost" data-a="reset">Recommencer</button><span class="hint-k"><kbd>Ctrl</kbd>+<kbd>Entrée</kbd> vérifie</span>';
+  bar.innerHTML = '<button class="btn check" data-a="check">✓ Vérifier</button><button class="btn" data-a="run">▶ Exécuter</button><button class="btn ghost" data-a="hint">Indice</button><button class="btn ghost" data-a="sol">Solution</button><button class="btn ghost" data-a="reset">Recommencer</button><span class="hint-k"><kbd>Ctrl</kbd>+<kbd>Entrée</kbd> vérifie · <kbd>Échap</kbd> sort de l\'éditeur</span>';
   const extra = document.createElement('div');
   async function go(mode) {
     bar.querySelectorAll('[data-a="check"],[data-a="run"]').forEach(b => b.disabled = true);
@@ -596,7 +596,7 @@ function buildSandbox() {
   const out = document.createElement('div'); out.className = 'out'; out.setAttribute('aria-live', 'polite');
   const ed = makeEditor('bac', code, { onRun: go, label: 'Bac à sable' });
   const bar = document.createElement('div'); bar.className = 'bar-act';
-  bar.innerHTML = '<button class="btn primary" data-a="run">▶ Exécuter</button><button class="btn ghost" data-a="clear">Tout effacer</button><button class="btn ghost" data-a="reset">Exemple de départ</button><span class="hint-k"><kbd>Ctrl</kbd>+<kbd>Entrée</kbd></span>';
+  bar.innerHTML = '<button class="btn primary" data-a="run">▶ Exécuter</button><button class="btn ghost" data-a="clear">Tout effacer</button><button class="btn ghost" data-a="reset">Exemple de départ</button><span class="hint-k"><kbd>Ctrl</kbd>+<kbd>Entrée</kbd> · <kbd>Échap</kbd> sort de l\'éditeur</span>';
   async function go() {
     const btn = bar.querySelector('[data-a="run"]'); btn.disabled = true;
     out.innerHTML = '<div class="muted">Exécution…</div>';
