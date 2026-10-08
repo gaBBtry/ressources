@@ -511,7 +511,7 @@ function refreshFin() {
   const fin = document.getElementById('fin'); if (!fin) return;
   const n = ALL_EX.filter(id => done.has(id)).length;
   fin.innerHTML = n === ALL_EX.length
-    ? '<h2>Parcours terminé</h2><p>Les ' + n + ' exercices sont réussis : tu as couvert le Python attendu en terminale, des variables jusqu\'à la méthode d\'Euler. Garde le livret PDF comme aide-mémoire.</p>'
+    ? '<h2>Parcours terminé</h2><p>Les ' + n + ' exercices sont réussis : tu as couvert le Python attendu en terminale, des variables jusqu\'à la méthode d\'Euler. Garde le <a href="livret-python-terminale.pdf">livret PDF</a> comme aide-mémoire.</p>'
     : '<h2 style="color:var(--ink)">Bilan</h2><p>' + n + ' exercice' + (n > 1 ? 's' : '') + ' réussi' + (n > 1 ? 's' : '') + ' sur ' + ALL_EX.length + '. Les étapes sans coche dans la frise ont encore un exercice à reprendre.</p>';
 }
 
