@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Parcours de 1 h 30 pour maîtriser le Python de terminale (spé maths et physique-chimie) : bases, numpy, matplotlib, méthode d'Euler. Exercices corrigés automatiquement, rien à installer.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%232348c9%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-family=%27monospace%27 font-size=%2716%27 font-weight=%27bold%27 fill=%27white%27 text-anchor=%27middle%27%3Epy%3C/text%3E%3C/svg%3E">
+<title>Python en Terminale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Mise en page : cahier de TP. Frise minutée à gauche (axe des temps du parcours), colonne de travail à droite. */
+:root {
+  --paper: #f6f7fb;
+  --sheet: #ffffff;
+  --ink: #18203a;
+  --ink-soft: #4d5677;
+  --rule: #dde1ee;
+  --grid: #e9ecf5;
+  --accent: #2348c9;        /* bleu stylo */
+  --accent-soft: #e6ecfd;
+  --ok: #12805c;
+  --ok-soft: #e1f4ec;
+  --bad: #c2362b;
+  --bad-soft: #fbe7e5;
+  --warn: #9a6400;
+  --warn-soft: #fdf1d9;
+  --code-bg: #f1f3f9;
+  --code-fg: #1d2440;
+  --hl-kw: #2348c9;
+  --hl-str: #0f7a57;
+  --hl-num: #b0510d;
+  --hl-com: #7a82a0;
+  --hl-bi: #7b3fb8;
+  --shadow: 0 1px 2px rgba(24,32,58,.06), 0 4px 16px rgba(24,32,58,.05);
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --s1: .25rem; --s2: .5rem; --s3: .75rem; --s4: 1rem; --s5: 1.5rem; --s6: 2rem; --s7: 3rem;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0f1320; --sheet: #161b2b; --ink: #e6e9f4; --ink-soft: #a3abc6; --rule: #2a3149; --grid: #1c2235;
+  --accent: #8aa6ff; --accent-soft: #1e2a52; --ok: #4fd1a1; --ok-soft: #133528; --bad: #ff8a7e; --bad-soft: #3d1c1a;
+  --warn: #f2c063; --warn-soft: #3a2c10; --code-bg: #10141f; --code-fg: #dfe4f3;
+  --hl-kw: #8aa6ff; --hl-str: #6fd6a8; --hl-num: #f3a76a; --hl-com: #7c86a6; --hl-bi: #c99bff;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #0f1320; --sheet: #161b2b; --ink: #e6e9f4; --ink-soft: #a3abc6; --rule: #2a3149; --grid: #1c2235;
+  --accent: #8aa6ff; --accent-soft: #1e2a52; --ok: #4fd1a1; --ok-soft: #133528; --bad: #ff8a7e; --bad-soft: #3d1c1a;
+  --warn: #f2c063; --warn-soft: #3a2c10; --code-bg: #10141f; --code-fg: #dfe4f3;
+  --hl-kw: #8aa6ff; --hl-str: #6fd6a8; --hl-num: #f3a76a; --hl-com: #7c86a6; --hl-bi: #c99bff;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.55; }
+a { color: var(--accent); }
+code, kbd { font-family: var(--f-mono); font-size: .88em; background: var(--code-bg); padding: .08em .35em; border-radius: 5px; color: var(--code-fg); }
+kbd { border: 1px solid var(--rule); border-bottom-width: 2px; }
+button { font: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* En-tête */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); border-bottom: 1px solid var(--rule);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 12px 12px; }
+.top-in { max-width: 1180px; margin: 0 auto; padding: var(--s3) var(--s4); display: flex; align-items: center; gap: var(--s4); flex-wrap: wrap; }
+.brand { white-space: nowrap; font-family: var(--f-display); font-weight: 800; font-size: 1.25rem; letter-spacing: -.01em; display: flex; align-items: baseline; gap: var(--s2); background: var(--sheet); padding: 0 .3rem; }
+.brand small { font-family: var(--f-body); font-weight: 400; font-size: .8rem; color: var(--ink-soft); }
+.spacer { flex: 1; }
+.pill { display: inline-flex; align-items: center; gap: .45rem; font-size: .82rem; padding: .3rem .7rem; border-radius: 999px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink-soft); white-space: nowrap; }
+.pill .dot { width: .55rem; height: .55rem; border-radius: 50%; background: var(--warn); }
+.pill.ready .dot { background: var(--ok); }
+.pill.fail .dot { background: var(--bad); }
+.pill.busy .dot { animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .3; } }
+.prog { display: flex; align-items: center; gap: var(--s2); font-size: .82rem; color: var(--ink-soft); background: var(--sheet); padding: .2rem .4rem; border-radius: 6px; font-variant-numeric: tabular-nums; }
+.bar { width: 120px; height: 8px; background: var(--grid); border-radius: 99px; overflow: hidden; border: 1px solid var(--rule); }
+.bar i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .4s; }
+
+/* Grille principale */
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: var(--s4); padding-block: var(--s5) var(--s7); display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: var(--s6); align-items: start; }
+@media (max-width: 860px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: var(--s4); } }
+
+/* Frise minutée */
+.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 76px); }
+.rail h2 { font-family: var(--f-display); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); margin: 0 0 var(--s3); }
+.steps { list-style: none; margin: 0; padding: 0; position: relative; }
+.steps::before { content: ""; position: absolute; left: 38px; top: 8px; bottom: 8px; width: 2px; background: var(--rule); }
+.steps li { position: relative; }
+.step { width: 100%; display: grid; grid-template-columns: 30px 18px 1fr; align-items: center; gap: .4rem; background: none; border: 0; color: var(--ink); text-align: left; padding: .45rem .3rem; border-radius: 8px; cursor: pointer; }
+.step:hover { background: var(--sheet); }
+.step .t { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-soft); text-align: right; font-variant-numeric: tabular-nums; }
+.step .tick { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--rule); background: var(--paper); justify-self: center; position: relative; z-index: 1; }
+.step .name { font-size: .92rem; line-height: 1.25; }
+.step .name small { display: block; color: var(--ink-soft); font-size: .76rem; font-variant-numeric: tabular-nums; }
+.step[aria-current="true"] { background: var(--sheet); box-shadow: var(--shadow); }
+.step[aria-current="true"] .tick { border-color: var(--accent); background: var(--accent); }
+.step.done .tick { border-color: var(--ok); background: var(--ok); }
+.step.done .tick::after { content: ""; position: absolute; left: 3px; top: 0px; width: 4px; height: 7px; border: solid var(--sheet); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.steps .end .t { color: var(--ink); font-weight: 700; }
+.rail .note { font-size: .8rem; color: var(--ink-soft); margin-top: var(--s4); padding-left: 44px; }
+@media (max-width: 860px) {
+  .rail { position: static; }
+  .rail h2, .rail .note { display: none; }
+  .steps { display: flex; gap: .3rem; overflow-x: auto; padding-bottom: .3rem; }
+  .steps::before { display: none; }
+  .step { grid-template-columns: auto 1fr; padding: .35rem .6rem; border: 1px solid var(--rule); background: var(--sheet); white-space: nowrap; }
+  .step .t { display: none; }
+  .step .name small { display: none; }
+}
+
+/* Contenu */
+main { min-width: 0; }
+main:focus { outline: none; }
+.mod-head { margin-bottom: var(--s5); }
+.eyebrow { font-family: var(--f-mono); font-size: .78rem; color: var(--accent); letter-spacing: .04em; text-transform: uppercase; }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.1; letter-spacing: -.02em; margin: .2rem 0 .5rem; text-wrap: balance; }
+.objectif { color: var(--ink-soft); margin: 0; max-width: 62ch; }
+.prose { max-width: 66ch; }
+.prose p { margin: 0 0 .7rem; }
+.formule { text-align: center; font-size: 1.1rem; background: var(--sheet); border: 1px dashed var(--rule); border-radius: var(--r); padding: .6rem; }
+h2.sec { font-family: var(--f-display); font-weight: 600; font-size: 1.35rem; margin: var(--s6) 0 var(--s3); display: flex; align-items: center; gap: var(--s3); }
+h2.sec::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+.notion { margin-bottom: var(--s5); }
+.notion h3, .exo h3 { font-family: var(--f-display); font-weight: 600; font-size: 1.08rem; margin: 0 0 .35rem; }
+.piege { display: grid; grid-template-columns: auto 1fr; gap: var(--s3); background: var(--warn-soft); border-radius: var(--r); padding: var(--s3) var(--s4); margin: var(--s4) 0; max-width: 72ch; }
+.piege b.lab { font-family: var(--f-mono); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--warn); padding-top: .2rem; }
+
+/* Exercices */
+.exo { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: var(--s4) var(--s4) var(--s4); margin-bottom: var(--s5); box-shadow: var(--shadow); }
+.exo-h { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+.exo-h .num { font-family: var(--f-mono); font-size: .78rem; color: var(--ink-soft); }
+.exo-h .badge { margin-left: auto; font-size: .78rem; padding: .15rem .55rem; border-radius: 99px; background: var(--grid); color: var(--ink-soft); }
+.exo.done .exo-h .badge { background: var(--ok-soft); color: var(--ok); font-weight: 700; }
+.exo .enonce p { margin: .2rem 0 .6rem; }
+
+/* Éditeur */
+.ed { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); background: var(--code-bg); border: 1px solid var(--rule); border-radius: var(--r); font-family: var(--f-mono); font-size: 15px; line-height: 1.5; overflow: hidden; }
+.ed:focus-within { border-color: var(--accent); }
+.gut { padding: .7rem .5rem .7rem .7rem; text-align: right; color: var(--hl-com); user-select: none; font-variant-numeric: tabular-nums; border-right: 1px solid var(--rule); min-width: 2.4rem; }
+.gut span { display: block; }
+.gut span.err { color: var(--bad); font-weight: 700; }
+.area { position: relative; min-width: 0; }
+.area pre, .area textarea { margin: 0; padding: .7rem .8rem; font: inherit; line-height: inherit; tab-size: 4; white-space: pre; letter-spacing: 0; border: 0; }
+.area pre { position: absolute; inset: 0; overflow: hidden; color: var(--code-fg); pointer-events: none; }
+.area textarea { position: relative; display: block; width: 100%; resize: none; background: transparent; color: transparent; caret-color: var(--ink); overflow-x: auto; overflow-y: hidden; outline: none; min-height: 3.6em; }
+.area textarea::selection { background: rgba(35,72,201,.25); color: transparent; }
+.tk-kw { color: var(--hl-kw); font-weight: 600; }
+.tk-str { color: var(--hl-str); }
+.tk-num { color: var(--hl-num); }
+.tk-com { color: var(--hl-com); font-style: italic; }
+.tk-bi { color: var(--hl-bi); }
+.ed.ro { background: var(--code-bg); }
+
+.bar-act { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s2); align-items: center; }
+.btn { border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); padding: .42rem .9rem; border-radius: 8px; cursor: pointer; font-size: .92rem; display: inline-flex; align-items: center; gap: .4rem; }
+.btn:hover { border-color: var(--ink-soft); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--sheet); font-weight: 700; }
+.btn.check { background: var(--ok); border-color: var(--ok); color: var(--sheet); font-weight: 700; }
+.btn.ghost { border-color: transparent; color: var(--ink-soft); }
+.btn.ghost:hover { color: var(--ink); border-color: var(--rule); }
+.btn[disabled] { opacity: .55; cursor: progress; }
+.hint-k { font-size: .75rem; color: var(--ink-soft); margin-left: auto; }
+@media (max-width: 560px) { .hint-k { display: none; } }
+
+/* Sortie */
+.out { margin-top: var(--s3); display: grid; gap: var(--s2); }
+.out:empty { display: none; }
+.out pre.std { margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-left: 4px solid var(--ink-soft); border-radius: 8px; padding: .6rem .8rem; font-family: var(--f-mono); font-size: 14px; white-space: pre-wrap; word-break: break-word; max-height: 320px; overflow: auto; }
+.out .lbl { font-family: var(--f-mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+.out .muted { color: var(--ink-soft); font-size: .9rem; }
+.msg { border-radius: 8px; padding: .65rem .85rem; font-size: .95rem; }
+.msg.err { background: var(--bad-soft); }
+.msg.err b { color: var(--bad); }
+.msg.err code { background: transparent; padding: 0; }
+.msg.ok { background: var(--ok-soft); color: var(--ok); font-weight: 700; }
+.msg.no { background: var(--warn-soft); }
+.msg.no b { color: var(--warn); }
+.msg .why { display: block; margin-top: .25rem; }
+.fig { background: #ffffff; border: 1px solid var(--rule); border-radius: 8px; padding: .4rem; justify-self: start; max-width: 100%; }
+.fig img { display: block; max-width: 100%; height: auto; }
+.reveal { margin-top: var(--s3); padding: var(--s3) var(--s4); border-radius: 8px; background: var(--accent-soft); font-size: .95rem; }
+.reveal .ed { margin-top: var(--s2); }
+
+.nav-mod { display: flex; justify-content: space-between; gap: var(--s3); margin-top: var(--s6); flex-wrap: wrap; }
+.nav-mod .btn { padding: .6rem 1rem; }
+.fin { background: var(--ok-soft); border-radius: 14px; padding: var(--s4) var(--s5); margin-top: var(--s5); }
+.fin h2 { font-family: var(--f-display); margin: 0 0 .3rem; color: var(--ok); }
+.welcome { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: var(--s4) var(--s5); margin-bottom: var(--s5); display: grid; gap: .5rem; }
+.welcome ul { margin: 0; padding-left: 1.1rem; }
+@media (max-width: 560px) {
+  .top-in { gap: .5rem; padding: .5rem var(--s4); flex-wrap: nowrap; }
+  .brand { font-size: 1.02rem; padding: 0; }
+  .brand small, .prog .lng { display: none; }
+  .bar { width: 48px; }
+  .pill { padding: .25rem .55rem; font-size: .78rem; }
+  body { font-size: 16px; }
+  .exo { padding: var(--s3); }
+}
+@media (max-width: 420px) {
+  .bar { display: none; }
+  .top-in { padding-inline: .75rem; }
+  .brand { font-size: .95rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .prog { padding: .2rem 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Python en Terminale <small>spé maths · physique-chimie</small></div>
+    <div class="spacer"></div>
+    <div class="prog" aria-live="polite"><div class="bar"><i id="barFill"></i></div><span id="progTxt">0 / 0 exercices</span></div>
+    <div class="pill busy" id="pyPill" role="status"><span class="dot"></span><span id="pyTxt">Python se charge…</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="rail" aria-label="Déroulé du parcours">
+    <h2>Déroulé · 1 h 30</h2>
+    <ol class="steps" id="steps"></ol>
+    <p class="note">Minutes indiquées : début conseillé de chaque étape.</p>
+  </nav>
+  <main id="main" tabindex="-1"></main>
+</div>
+
+<script>
+const DATA = [{"id": "m0", "titre": "Prise en main", "duree": 5, "objectif": "Écrire et exécuter sa première ligne de Python.", "intro": "<p>Chaque cadre gris est un éditeur : tu peux modifier le code puis cliquer sur <b>Exécuter<\/b> (ou <kbd>Ctrl<\/kbd>+<kbd>Entrée<\/kbd>). Le résultat s'affiche juste en dessous.<\/p>\n<p>Dans les exercices, le bouton <b>Vérifier<\/b> teste ta réponse automatiquement. Rien ne s'installe : tout tourne dans le navigateur.<\/p>", "notions": [{"titre": "Afficher avec print", "texte": "<p><code>print()<\/code> affiche une valeur. Une ligne qui commence par <code>#<\/code> est un commentaire : Python l'ignore.<\/p>", "code": "# Mon premier programme\nprint(\"Bonjour !\")\nprint(2 + 3)\nprint(\"2 + 3 =\", 2 + 3)"}], "exercices": [{"id": "e01", "titre": "Bonjour terminale", "enonce": "<p>Affiche exactement le texte <code>Bonjour terminale<\/code>.<\/p>", "depart": "# Écris ta ligne ci-dessous\n", "solution": "print(\"Bonjour terminale\")", "indice": "Le texte se met entre guillemets à l'intérieur des parenthèses de print.", "test": "assert \"Bonjour terminale\" in sortie, \"Je ne vois pas « Bonjour terminale » dans ce qui est affiché (attention aux majuscules).\"\n"}]}, {"id": "m1", "titre": "Variables et calculs", "duree": 10, "objectif": "Stocker des valeurs, calculer, connaître les types de base.", "intro": "<p>Une <b>variable<\/b> est un nom qui désigne une valeur. Le signe <code>=<\/code> est une <b>affectation<\/b> : on calcule à droite, on range le résultat dans le nom de gauche.<\/p>", "notions": [{"titre": "Affectation et types", "texte": "<p>Les quatre types de base : <code>int<\/code> (entier), <code>float<\/code> (décimal, avec un <b>point<\/b>), <code>str<\/code> (texte), <code>bool<\/code> (<code>True<\/code>/<code>False<\/code>). La fonction <code>type()<\/code> donne le type.<\/p>", "code": "m = 2.5          # float : on écrit 2.5, jamais 2,5\nn = 3            # int\nnom = \"Lou\"      # str\nmajeur = n > 2   # bool\nprint(type(m), type(n), type(nom), type(majeur))\nn = n + 1        # on recalcule n à partir de l'ancien n\nprint(n)"}, {"titre": "Opérations", "texte": "<p><code>**<\/code> est la puissance (pas <code>^<\/code>). <code>//<\/code> donne le quotient entier, <code>%<\/code> le reste de la division euclidienne.<\/p>", "code": "print(7 / 2)    # 3.5\nprint(7 // 2)   # 3  (quotient entier)\nprint(7 % 2)    # 1  (reste)\nprint(2 ** 10)  # 1024\nprint(round(3.14159, 2))\nprint(3e8)      # écriture scientifique : 3×10^8"}, {"titre": "Afficher proprement : f-string", "texte": "<p>Un texte précédé de <code>f<\/code> remplace ce qui est entre accolades par sa valeur. <code>:.2f<\/code> arrondit l'affichage à 2 décimales.<\/p>", "code": "v = 12.3456\nprint(f\"v = {v:.2f} m/s\")\nprint(f\"v = {v:.2e} m/s\")"}], "piege": "Un nombre à virgule s'écrit avec un point : <code>9.81<\/code>. Écrire <code>9,81<\/code> crée autre chose (un couple de deux entiers) sans message d'erreur.", "exercices": [{"id": "e11", "titre": "Énergie cinétique", "enonce": "<p>Un ballon de masse <code>m = 0.45<\/code> kg se déplace à <code>v = 20<\/code> m/s. Calcule son énergie cinétique <i>E<\/i><sub>c<\/sub> = ½ <i>m<\/i> <i>v<\/i>² dans une variable <code>Ec<\/code>, puis affiche-la.<\/p>", "depart": "m = 0.45\nv = 20\nEc = ...\nprint(Ec)\n", "solution": "m = 0.45\nv = 20\nEc = 0.5 * m * v**2\nprint(Ec)", "indice": "Le carré s'écrit v**2. Pour ½, écris 0.5 ou 1/2.", "test": "assert \"Ec\" in ns, \"Il faut une variable nommée Ec.\"\nassert not isinstance(ns[\"Ec\"], type(Ellipsis)), \"Remplace les ... par le calcul.\"\nassert proche(ns[\"Ec\"], 90), f\"Ec vaut {ns['Ec']} : la valeur attendue est 90 J. As-tu écrit v**2 ?\"\n"}, {"id": "e12", "titre": "Division euclidienne", "enonce": "<p>Range dans <code>q<\/code> le quotient et dans <code>r<\/code> le reste de la division euclidienne de 2026 par 7.<\/p>", "depart": "q = ...\nr = ...\nprint(q, r)\n", "solution": "q = 2026 // 7\nr = 2026 % 7\nprint(q, r)", "indice": "Quotient entier : //. Reste : %.", "test": "assert \"q\" in ns and \"r\" in ns, \"Il faut deux variables q et r.\"\nassert ns[\"q\"] == 289, f\"q vaut {ns['q']} : utilise // (quotient entier), pas /.\"\nassert ns[\"r\"] == 3, f\"r vaut {ns['r']} : le reste s'obtient avec %.\"\n"}]}, {"id": "m2", "titre": "Fonctions et conditions", "duree": 15, "objectif": "Écrire une fonction qui renvoie un résultat, utiliser if / elif / else.", "intro": "<p>Une <b>fonction<\/b> regroupe des instructions sous un nom. Elle reçoit des <b>paramètres<\/b> et <b>renvoie<\/b> un résultat avec <code>return<\/code>. Le bloc de la fonction est <b>indenté<\/b> (décalé de 4 espaces) après les deux-points.<\/p>", "notions": [{"titre": "Définir et appeler une fonction", "texte": "<p>Comme en maths : on définit <i>f<\/i>, puis on calcule <i>f<\/i>(3).<\/p>", "code": "def f(x):\n    return 3 * x**2 - 2\n\nprint(f(0), f(3))\n\ndef vitesse_moyenne(d, t):\n    return d / t\n\nprint(vitesse_moyenne(100, 9.58))"}, {"titre": "return n'est pas print", "texte": "<p><code>return<\/code> rend une valeur qu'on peut réutiliser dans un calcul. <code>print<\/code> ne fait qu'afficher : la fonction renvoie alors <code>None<\/code>.<\/p>", "code": "def double_affiche(x):\n    print(2 * x)\n\ndef double(x):\n    return 2 * x\n\na = double(5) + 1           # 11\nb = double_affiche(5)       # affiche 10, mais b vaut None\nprint(a, b)"}, {"titre": "Conditions", "texte": "<p>Comparaisons : <code>==<\/code> (égal), <code>!=<\/code>, <code>&lt;<\/code>, <code>&lt;=<\/code>, <code>&gt;<\/code>, <code>&gt;=<\/code>. On combine avec <code>and<\/code>, <code>or<\/code>, <code>not<\/code>. Python teste les cas dans l'ordre et s'arrête au premier vrai.<\/p>", "code": "def mention(note):\n    if note >= 16:\n        return \"Très bien\"\n    elif note >= 14:\n        return \"Bien\"\n    elif note >= 10:\n        return \"Admis\"\n    else:\n        return \"Non admis\"\n\nprint(mention(17), mention(12), mention(8))"}], "piege": "<code>=<\/code> affecte, <code>==<\/code> compare. Et n'oublie pas les deux-points <code>:<\/code> en fin de ligne <code>def<\/code>, <code>if<\/code>, <code>elif<\/code>, <code>else<\/code>.", "exercices": [{"id": "e21", "titre": "Une fonction mathématique", "enonce": "<p>Définis la fonction <code>g<\/code> telle que <i>g<\/i>(<i>x<\/i>) = <i>x<\/i>² − 4<i>x<\/i> + 3. Elle doit <b>renvoyer<\/b> le résultat.<\/p>", "depart": "def g(x):\n    ...\n\nprint(g(1), g(2))\n", "solution": "def g(x):\n    return x**2 - 4*x + 3\n\nprint(g(1), g(2))", "indice": "Une seule ligne dans la fonction : return suivi de l'expression.", "test": "assert \"g\" in ns and callable(ns[\"g\"]), \"Il faut définir une fonction g.\"\nr = ns[\"g\"](0)\nassert r is not None, \"g ne renvoie rien : utilise return, pas print.\"\nfor x, att in [(0, 3), (1, 0), (2, -1), (5, 8), (0.5, 1.25)]:\n    assert proche(ns[\"g\"](x), att), f\"g({x}) vaut {ns['g'](x)}, attendu {att}.\"\n"}, {"id": "e22", "titre": "Acide, neutre ou basique", "enonce": "<p>À 25 °C, une solution est acide si pH &lt; 7, neutre si pH = 7, basique si pH &gt; 7. Écris la fonction <code>nature(pH)<\/code> qui renvoie <code>\"acide\"<\/code>, <code>\"neutre\"<\/code> ou <code>\"basique\"<\/code>.<\/p>", "depart": "def nature(pH):\n    if pH < 7:\n        return \"acide\"\n    ...\n\nprint(nature(3.2), nature(7), nature(11))\n", "solution": "def nature(pH):\n    if pH < 7:\n        return \"acide\"\n    elif pH == 7:\n        return \"neutre\"\n    else:\n        return \"basique\"\n\nprint(nature(3.2), nature(7), nature(11))", "indice": "Ajoute un elif pH == 7: puis un else:, chacun suivi d'un return indenté.", "test": "assert \"nature\" in ns and callable(ns[\"nature\"]), \"Il faut définir la fonction nature.\"\nfor p, att in [(1, \"acide\"), (6.9, \"acide\"), (7, \"neutre\"), (7.0, \"neutre\"), (7.1, \"basique\"), (14, \"basique\")]:\n    r = ns[\"nature\"](p)\n    assert r == att, f\"nature({p}) renvoie {r!r}, attendu {att!r}.\"\n"}]}, {"id": "m3", "titre": "Boucles et suites", "duree": 15, "objectif": "Répéter avec for, chercher un seuil avec while, calculer les termes d'une suite.", "intro": "<p><code>for<\/code> répète un nombre de fois <b>connu à l'avance<\/b>. <code>while<\/code> répète <b>tant qu'une condition est vraie<\/b> : c'est l'outil des algorithmes de seuil.<\/p>", "notions": [{"titre": "for et range", "texte": "<p><code>range(n)<\/code> donne 0, 1, …, n−1 (n valeurs, <b>n exclu<\/b>). <code>range(a, b)<\/code> va de a à b−1 ; <code>range(a, b, pas)<\/code> avance de pas en pas.<\/p>", "code": "for i in range(5):\n    print(i, i**2)\n\nprint(list(range(2, 11, 2)))"}, {"titre": "Accumulateur", "texte": "<p>On initialise <b>avant<\/b> la boucle, on met à jour <b>dans<\/b> la boucle.<\/p>", "code": "# Somme des carrés de 1 à 10\nS = 0\nfor k in range(1, 11):\n    S = S + k**2\nprint(S)"}, {"titre": "Terme d'une suite récurrente", "texte": "<p>Pour <i>u<\/i><sub>0<\/sub> = 2 et <i>u<\/i><sub><i>n<\/i>+1<\/sub> = 0,5 <i>u<\/i><sub><i>n<\/i><\/sub> + 3 : on part de <i>u<\/i><sub>0<\/sub> et on applique la relation <i>n<\/i> fois.<\/p>", "code": "def u(n):\n    terme = 2\n    for k in range(n):\n        terme = 0.5 * terme + 3\n    return terme\n\nprint(u(0), u(1), u(10))"}, {"titre": "Algorithme de seuil avec while", "texte": "<p>Un capital de 1000 € placé à 3 % par an : au bout de combien d'années dépasse-t-il 1500 € ? On avance <b>tant que<\/b> le seuil n'est pas atteint.<\/p>", "code": "C = 1000\nn = 0\nwhile C <= 1500:\n    C = C * 1.03\n    n = n + 1\nprint(n, round(C, 2))"}], "piege": "Dans un <code>while<\/code>, la condition doit finir par devenir fausse, sinon la boucle ne s'arrête jamais. Ici, un programme qui tourne plus de 5 s est arrêté automatiquement.", "exercices": [{"id": "e31", "titre": "Somme de 1 à 100", "enonce": "<p>Avec une boucle <code>for<\/code>, calcule dans <code>S<\/code> la somme 1 + 2 + 3 + … + 100.<\/p>", "depart": "S = 0\nfor k in range(...):\n    ...\nprint(S)\n", "solution": "S = 0\nfor k in range(1, 101):\n    S = S + k\nprint(S)", "indice": "range(1, 101) va de 1 à 100. Dans la boucle : S = S + k.", "test": "assert \"S\" in ns, \"Il faut une variable S.\"\nassert ns[\"S\"] != 4950, \"S vaut 4950 : il manque 100. range(a, b) s'arrête à b − 1.\"\nassert ns[\"S\"] == 5050, f\"S vaut {ns['S']}, attendu 5050.\"\n"}, {"id": "e32", "titre": "Terme d'une suite", "enonce": "<p>La suite (<i>v<\/i><sub><i>n<\/i><\/sub>) est définie par <i>v<\/i><sub>0<\/sub> = 0 et <i>v<\/i><sub><i>n<\/i>+1<\/sub> = 2<i>v<\/i><sub><i>n<\/i><\/sub> + 1. Écris la fonction <code>v(n)<\/code> qui renvoie <i>v<\/i><sub><i>n<\/i><\/sub>.<\/p>", "depart": "def v(n):\n    terme = 0\n    ...\n    return terme\n\nprint(v(3))\n", "solution": "def v(n):\n    terme = 0\n    for k in range(n):\n        terme = 2 * terme + 1\n    return terme\n\nprint(v(3))", "indice": "Une boucle for k in range(n): qui remplace terme par 2 * terme + 1.", "test": "assert \"v\" in ns and callable(ns[\"v\"]), \"Il faut définir la fonction v.\"\nfor n, att in [(0, 0), (1, 1), (3, 7), (10, 1023)]:\n    r = ns[\"v\"](n)\n    assert r == att, f\"v({n}) renvoie {r}, attendu {att}.\"\n"}, {"id": "e33", "titre": "Seuil : décroissance radioactive", "enonce": "<p>Un échantillon contient 1000 noyaux ; chaque année, il en reste 80 %. Écris la fonction <code>seuil(s)<\/code> qui renvoie le <b>premier<\/b> nombre d'années <i>n<\/i> pour lequel il reste <b>strictement moins<\/b> de <code>s<\/code> noyaux.<\/p>", "depart": "def seuil(s):\n    N = 1000\n    n = 0\n    while ...:\n        ...\n    return n\n\nprint(seuil(100))\n", "solution": "def seuil(s):\n    N = 1000\n    n = 0\n    while N >= s:\n        N = 0.8 * N\n        n = n + 1\n    return n\n\nprint(seuil(100))", "indice": "On continue tant que N >= s. Dans la boucle : N = 0.8 * N et n = n + 1.", "test": "assert \"seuil\" in ns and callable(ns[\"seuil\"]), \"Il faut définir la fonction seuil.\"\nfor s, att in [(100, 11), (500, 4), (1001, 0), (800, 2)]:\n    r = ns[\"seuil\"](s)\n    assert r == att, f\"seuil({s}) renvoie {r}, attendu {att}. Vérifie la condition du while (strictement moins de s à la fin).\"\n"}]}, {"id": "m4", "titre": "Listes", "duree": 10, "objectif": "Créer, parcourir et transformer une liste ; listes en compréhension.", "intro": "<p>Une <b>liste<\/b> range plusieurs valeurs dans l'ordre, entre crochets. Les indices commencent à <b>0<\/b>.<\/p>", "notions": [{"titre": "Créer, lire, ajouter", "texte": "<p><code>L[0]<\/code> est le premier élément, <code>L[-1]<\/code> le dernier, <code>len(L)<\/code> la longueur. <code>L.append(x)<\/code> ajoute <code>x<\/code> à la fin.<\/p>", "code": "L = [12, 15, 9, 18]\nprint(L[0], L[-1], len(L))\nL.append(14)\nprint(L)\nprint(sum(L), max(L), min(L))\nprint(L[1:3])   # tranche : indices 1 et 2"}, {"titre": "Parcourir", "texte": "<p>On parcourt les <b>éléments<\/b> directement, ou les <b>indices<\/b> avec <code>range(len(L))<\/code>.<\/p>", "code": "notes = [12, 15, 9]\nfor x in notes:\n    print(x)\nfor i in range(len(notes)):\n    print(\"note\", i, \":\", notes[i])"}, {"titre": "Construire une liste", "texte": "<p>Avec <code>append<\/code> dans une boucle, ou en une ligne avec une liste <b>en compréhension<\/b> (au programme de spécialité maths).<\/p>", "code": "# avec append\ncubes = []\nfor k in range(6):\n    cubes.append(k**3)\nprint(cubes)\n\n# en compréhension\ncubes2 = [k**3 for k in range(6)]\npairs = [k for k in range(20) if k % 2 == 0]\nprint(cubes2, pairs)"}], "piege": "Une liste de <i>n<\/i> éléments a des indices de 0 à <i>n<\/i>−1 : <code>L[len(L)]<\/code> provoque une <code>IndexError<\/code>.", "exercices": [{"id": "e41", "titre": "Liste des carrés", "enonce": "<p>Construis la liste <code>carres<\/code> contenant les carrés des entiers de 0 à 9 : [0, 1, 4, …, 81].<\/p>", "depart": "carres = ...\nprint(carres)\n", "solution": "carres = [k**2 for k in range(10)]\nprint(carres)", "indice": "En compréhension : [k**2 for k in range(10)].", "test": "assert \"carres\" in ns, \"Il faut une variable carres.\"\nassert isinstance(ns[\"carres\"], list), \"carres doit être une liste (entre crochets).\"\nassert ns[\"carres\"] == [k**2 for k in range(10)], f\"carres vaut {ns['carres']} : attendu [0, 1, 4, …, 81], soit 10 valeurs.\"\n"}, {"id": "e42", "titre": "Moyenne d'une série de mesures", "enonce": "<p>Écris la fonction <code>moyenne(L)<\/code> qui renvoie la moyenne des nombres de la liste <code>L<\/code> (sans numpy).<\/p>", "depart": "def moyenne(L):\n    ...\n\nmesures = [9.79, 9.83, 9.80, 9.85, 9.78]\nprint(moyenne(mesures))\n", "solution": "def moyenne(L):\n    return sum(L) / len(L)\n\nmesures = [9.79, 9.83, 9.80, 9.85, 9.78]\nprint(moyenne(mesures))", "indice": "sum(L) donne la somme, len(L) le nombre de valeurs.", "test": "assert \"moyenne\" in ns and callable(ns[\"moyenne\"]), \"Il faut définir la fonction moyenne.\"\nfor L in [[1, 2, 3], [9.79, 9.83, 9.80, 9.85, 9.78], [5], [-2, 2, 6]]:\n    att = sum(L) / len(L)\n    r = ns[\"moyenne\"](L)\n    assert r is not None, \"moyenne ne renvoie rien : utilise return.\"\n    assert proche(r, att), f\"moyenne({L}) renvoie {r}, attendu {att}.\"\n"}, {"id": "e43", "titre": "Filtrer les valeurs", "enonce": "<p>Écris la fonction <code>positifs(L)<\/code> qui renvoie la liste des éléments <b>strictement positifs<\/b> de <code>L<\/code>, dans le même ordre.<\/p>", "depart": "def positifs(L):\n    ...\n\nprint(positifs([3, -1, 0, 7, -5, 2]))\n", "solution": "def positifs(L):\n    return [x for x in L if x > 0]\n\nprint(positifs([3, -1, 0, 7, -5, 2]))", "indice": "[x for x in L if x > 0], ou une boucle avec append.", "test": "assert \"positifs\" in ns and callable(ns[\"positifs\"]), \"Il faut définir la fonction positifs.\"\nfor L in [[3, -1, 0, 7, -5, 2], [], [-1, -2], [0.5, 0, -0.5]]:\n    att = [x for x in L if x > 0]\n    r = ns[\"positifs\"](L)\n    assert r == att, f\"positifs({L}) renvoie {r}, attendu {att}. Attention : 0 n'est pas strictement positif.\"\n"}]}, {"id": "m5", "titre": "NumPy", "duree": 15, "objectif": "Créer des tableaux, calculer sans boucle, exploiter des mesures.", "intro": "<p><b>NumPy<\/b> manipule des tableaux de nombres (<code>array<\/code>). Une opération s'applique à <b>tous les éléments d'un coup<\/b>, sans boucle. On l'importe toujours sous le nom <code>np<\/code>.<\/p>", "notions": [{"titre": "Créer un tableau", "texte": "<p><code>np.linspace(a, b, n)<\/code> : <i>n<\/i> valeurs régulièrement espacées de <i>a<\/i> à <i>b<\/i> <b>inclus<\/b>. <code>np.arange(a, b, pas)<\/code> : de <i>a<\/i> à <i>b<\/i> <b>exclu<\/b> avec un pas.<\/p>", "code": "import numpy as np\n\nt = np.linspace(0, 1, 5)\nprint(t)\nprint(np.arange(0, 1, 0.25))\nmesures = np.array([2.1, 3.9, 6.2, 7.8])\nprint(mesures, len(mesures))"}, {"titre": "Calculer sur tout le tableau", "texte": "<p>Les fonctions mathématiques de NumPy (<code>np.exp<\/code>, <code>np.sin<\/code>, <code>np.sqrt<\/code>, <code>np.log<\/code>…) acceptent un tableau entier. <code>np.pi<\/code> vaut π.<\/p>", "code": "import numpy as np\n\nt = np.linspace(0, 2, 5)\nx = 5 * t**2          # tous les x d'un coup\nprint(x)\nprint(np.sin(np.pi * t))\nprint(np.mean(x), np.max(x), np.min(x))"}, {"titre": "Tableau ou liste ?", "texte": "<p>Sur une liste, <code>*<\/code> et <code>+<\/code> répètent ou collent. Sur un tableau, ils calculent.<\/p>", "code": "import numpy as np\n\nL = [1, 2, 3]\nA = np.array([1, 2, 3])\nprint(L * 2)    # [1, 2, 3, 1, 2, 3]\nprint(A * 2)    # [2 4 6]"}, {"titre": "Exploiter des mesures", "texte": "<p><code>np.diff(x)<\/code> donne les écarts entre valeurs successives : <code>np.diff(x) / np.diff(t)<\/code> approche la vitesse. <code>np.polyfit(x, y, 1)<\/code> renvoie le coefficient directeur et l'ordonnée à l'origine de la droite de régression.<\/p>", "code": "import numpy as np\n\nU = np.array([0, 1.0, 2.0, 3.0, 4.0])        # tension (V)\nI = np.array([0, 0.021, 0.039, 0.062, 0.080]) # intensité (A)\na, b = np.polyfit(I, U, 1)\nprint(f\"R ≈ {a:.0f} Ω, ordonnée à l'origine {b:.3f} V\")"}], "piege": "<code>np.linspace(0, 10, 10)<\/code> ne donne pas un pas de 1 : il faut 11 valeurs pour aller de 0 à 10 par pas de 1.", "exercices": [{"id": "e51", "titre": "Loi de décroissance", "enonce": "<p>Crée <code>t<\/code> : 101 instants régulièrement espacés de 0 à 10 s. Calcule ensuite le tableau <code>N<\/code> = <i>N<\/i><sub>0<\/sub> e<sup>−λ<i>t<\/i><\/sup> avec <i>N<\/i><sub>0<\/sub> = 1000 et λ = 0,3 s<sup>−1<\/sup>.<\/p>", "depart": "import numpy as np\n\nN0 = 1000\nlam = 0.3\nt = ...\nN = ...\nprint(N[0], N[-1])\n", "solution": "import numpy as np\n\nN0 = 1000\nlam = 0.3\nt = np.linspace(0, 10, 101)\nN = N0 * np.exp(-lam * t)\nprint(N[0], N[-1])", "indice": "t = np.linspace(0, 10, 101) puis N = N0 * np.exp(-lam * t).", "test": "assert \"t\" in ns and \"N\" in ns, \"Il faut les variables t et N.\"\nt, N = np.asarray(ns[\"t\"]), np.asarray(ns[\"N\"])\nassert t.shape == (101,), f\"t contient {t.size} valeurs, il en faut 101.\"\nassert proche(t[0], 0) and proche(t[-1], 10), \"t doit aller de 0 à 10 inclus : utilise np.linspace.\"\nassert N.shape == (101,), \"N doit être un tableau de même taille que t.\"\nassert proche(N[0], 1000) and proche(N[-1], 1000 * np.exp(-3), 1e-4), f\"N[-1] vaut {N[-1]:.3f}, attendu 49.787. As-tu mis le signe moins dans l'exponentielle ?\"\n"}, {"id": "e52", "titre": "Vitesse à partir des positions", "enonce": "<p>Une chronophotographie donne les positions <code>x<\/code> (m) aux instants <code>t<\/code> (s). Calcule le tableau <code>v<\/code> des vitesses moyennes entre deux images successives.<\/p>", "depart": "import numpy as np\n\nt = np.array([0, 0.1, 0.2, 0.3, 0.4])\nx = np.array([0, 0.05, 0.20, 0.45, 0.80])\nv = ...\nprint(v)\n", "solution": "import numpy as np\n\nt = np.array([0, 0.1, 0.2, 0.3, 0.4])\nx = np.array([0, 0.05, 0.20, 0.45, 0.80])\nv = np.diff(x) / np.diff(t)\nprint(v)", "indice": "v = np.diff(x) / np.diff(t). Le tableau obtenu a une valeur de moins que x.", "test": "assert \"v\" in ns, \"Il faut une variable v.\"\nv = np.asarray(ns[\"v\"], dtype=float)\nassert v.shape == (4,), f\"v contient {v.size} valeurs ; avec 5 positions on obtient 4 vitesses (np.diff).\"\nassert np.allclose(v, [0.5, 1.5, 2.5, 3.5]), f\"v vaut {v}, attendu [0.5 1.5 2.5 3.5] m/s.\"\n"}, {"id": "e53", "titre": "Régression : loi de Beer-Lambert", "enonce": "<p>On mesure l'absorbance <code>A<\/code> de solutions de concentration <code>C<\/code> (mmol/L). Avec <code>np.polyfit<\/code>, range dans <code>k<\/code> le coefficient directeur et dans <code>b<\/code> l'ordonnée à l'origine de la droite de régression de A en fonction de C.<\/p>", "depart": "import numpy as np\n\nC = np.array([1.0, 2.0, 3.0, 4.0, 5.0])\nA = np.array([0.21, 0.40, 0.62, 0.79, 1.01])\nk, b = ...\nprint(f\"A = {k:.3f} × C + {b:.3f}\")\n", "solution": "import numpy as np\n\nC = np.array([1.0, 2.0, 3.0, 4.0, 5.0])\nA = np.array([0.21, 0.40, 0.62, 0.79, 1.01])\nk, b = np.polyfit(C, A, 1)\nprint(f\"A = {k:.3f} × C + {b:.3f}\")", "indice": "np.polyfit(abscisses, ordonnées, 1) : ici les abscisses sont C.", "test": "assert \"k\" in ns and \"b\" in ns, \"Il faut les variables k et b.\"\nkk, bb = np.polyfit([1.0, 2.0, 3.0, 4.0, 5.0], [0.21, 0.40, 0.62, 0.79, 1.01], 1)\nki, bi = np.polyfit([0.21, 0.40, 0.62, 0.79, 1.01], [1.0, 2.0, 3.0, 4.0, 5.0], 1)\nassert not proche(ns[\"k\"], ki, 1e-6), \"Les axes sont inversés : l'ordre est np.polyfit(C, A, 1), les abscisses d'abord.\"\nassert proche(ns[\"k\"], kk, 1e-6), f\"k vaut {ns['k']:.4f}, attendu {kk:.4f}. Calcule k et b avec np.polyfit(C, A, 1).\"\nassert proche(ns[\"b\"], bb, 1e-6) or abs(ns[\"b\"] - bb) < 1e-9, f\"b vaut {ns['b']:.4f}, attendu {bb:.4f}.\"\n"}]}, {"id": "m6", "titre": "Tracer avec Matplotlib", "duree": 12, "objectif": "Tracer une courbe ou des points, légender un graphique, représenter des vecteurs.", "intro": "<p><b>Matplotlib<\/b> trace des graphiques. On l'importe sous le nom <code>plt<\/code>. On empile les instructions (courbes, titres, légende) puis <code>plt.show()<\/code> affiche la figure.<\/p>", "notions": [{"titre": "Une courbe complète", "texte": "<p>Un graphique de physique a toujours des axes nommés <b>avec leurs unités<\/b>.<\/p>", "code": "import numpy as np\nimport matplotlib.pyplot as plt\n\nt = np.linspace(0, 0.02, 200)\nu = 5 * np.sin(2 * np.pi * 50 * t)\n\nplt.plot(t, u, label=\"u(t)\")\nplt.xlabel(\"t (s)\")\nplt.ylabel(\"u (V)\")\nplt.title(\"Tension sinusoïdale, 50 Hz\")\nplt.grid()\nplt.legend()\nplt.show()"}, {"titre": "Points de mesure et modèle", "texte": "<p>Les mesures se tracent en <b>points<\/b> (<code>'o'<\/code> ou <code>plt.scatter<\/code>), le modèle en <b>trait continu<\/b>.<\/p>", "code": "import numpy as np\nimport matplotlib.pyplot as plt\n\nt = np.array([0, 1, 2, 3, 4, 5])\nT = np.array([80, 64, 52, 43, 36, 31])   # température (°C)\n\nplt.plot(t, T, \"o\", label=\"mesures\")\ntm = np.linspace(0, 5, 100)\nplt.plot(tm, 20 + 60 * np.exp(-0.4 * tm), label=\"modèle\")\nplt.xlabel(\"t (min)\")\nplt.ylabel(\"T (°C)\")\nplt.legend()\nplt.show()"}, {"titre": "Représenter des vecteurs", "texte": "<p><code>plt.quiver(x, y, vx, vy)<\/code> dessine une flèche de composantes (<i>v<sub>x<\/sub><\/i>, <i>v<sub>y<\/sub><\/i>) au point (<i>x<\/i>, <i>y<\/i>). Les trois derniers réglages gardent l'échelle des axes. Exemple : vitesse le long d'une trajectoire de projectile.<\/p>", "code": "import numpy as np\nimport matplotlib.pyplot as plt\n\ng, v0 = 9.81, 10\nt = np.linspace(0, 1.4, 8)\nx = v0 * np.cos(np.pi/4) * t\ny = v0 * np.sin(np.pi/4) * t - 0.5 * g * t**2\nvx = np.diff(x) / np.diff(t)\nvy = np.diff(y) / np.diff(t)\n\nplt.plot(x, y, \"o-\")\nplt.quiver(x[:-1], y[:-1], vx, vy, angles=\"xy\", scale_units=\"xy\", scale=8, color=\"tab:red\")\nplt.axis(\"equal\")\nplt.xlabel(\"x (m)\")\nplt.ylabel(\"y (m)\")\nplt.show()"}], "piege": "Sur une même figure, <code>x<\/code> et <code>y<\/code> doivent avoir la <b>même taille<\/b>, sinon <code>ValueError<\/code>. Après <code>np.diff<\/code>, on a une valeur de moins : d'où <code>x[:-1]<\/code>.", "exercices": [{"id": "e61", "titre": "Tracer la décroissance", "enonce": "<p>Trace <i>N<\/i>(<i>t<\/i>) = 1000 e<sup>−0,3<i>t<\/i><\/sup> pour <i>t<\/i> entre 0 et 10 s. Nomme les axes : <code>\"t (s)\"<\/code> en abscisse et <code>\"N\"<\/code> en ordonnée.<\/p>", "depart": "import numpy as np\nimport matplotlib.pyplot as plt\n\nt = np.linspace(0, 10, 101)\nN = 1000 * np.exp(-0.3 * t)\n\n# trace la courbe et nomme les axes\n\nplt.show()\n", "solution": "import numpy as np\nimport matplotlib.pyplot as plt\n\nt = np.linspace(0, 10, 101)\nN = 1000 * np.exp(-0.3 * t)\n\nplt.plot(t, N)\nplt.xlabel(\"t (s)\")\nplt.ylabel(\"N\")\nplt.show()", "indice": "plt.plot(t, N), puis plt.xlabel(\"t (s)\") et plt.ylabel(\"N\").", "test": "assert plt is not None and plt.get_fignums(), \"Aucune figure : utilise plt.plot(t, N).\"\nax = plt.gcf().axes[0]\nassert ax.get_lines(), \"La figure est vide : utilise plt.plot(t, N).\"\ny = ax.get_lines()[0].get_ydata()\nassert len(y) == 101 and proche(y[0], 1000), \"La courbe tracée n'est pas N en fonction de t (vérifie l'ordre : plt.plot(t, N)).\"\nassert ax.get_xlabel().strip(), \"Il manque le nom de l'axe des abscisses : plt.xlabel(\\\"t (s)\\\").\"\nassert ax.get_ylabel().strip(), \"Il manque le nom de l'axe des ordonnées : plt.ylabel(\\\"N\\\").\"\n"}, {"id": "e62", "titre": "Mesures et droite de régression", "enonce": "<p>Sur un même graphique : trace les mesures (<code>C<\/code>, <code>A<\/code>) <b>en points<\/b> avec l'étiquette <code>\"mesures\"<\/code>, puis la droite modèle <i>A<\/i> = <i>k C<\/i> + <i>b<\/i> avec l'étiquette <code>\"modèle\"<\/code>. Affiche la légende.<\/p>", "depart": "import numpy as np\nimport matplotlib.pyplot as plt\n\nC = np.array([1.0, 2.0, 3.0, 4.0, 5.0])\nA = np.array([0.21, 0.40, 0.62, 0.79, 1.01])\nk, b = np.polyfit(C, A, 1)\n\n# 1) les points de mesure\n# 2) la droite modèle\n# 3) la légende et les noms d'axes\n\nplt.show()\n", "solution": "import numpy as np\nimport matplotlib.pyplot as plt\n\nC = np.array([1.0, 2.0, 3.0, 4.0, 5.0])\nA = np.array([0.21, 0.40, 0.62, 0.79, 1.01])\nk, b = np.polyfit(C, A, 1)\n\nplt.plot(C, A, \"o\", label=\"mesures\")\nplt.plot(C, k * C + b, label=\"modèle\")\nplt.xlabel(\"C (mmol/L)\")\nplt.ylabel(\"A\")\nplt.legend()\nplt.show()", "indice": "plt.plot(C, A, \"o\", label=\"mesures\") puis plt.plot(C, k * C + b, label=\"modèle\") et plt.legend().", "test": "assert plt is not None and plt.get_fignums(), \"Aucune figure tracée.\"\nax = plt.gcf().axes[0]\nn_traces = len(ax.get_lines()) + len(ax.collections)\nassert n_traces >= 2, \"Il faut deux tracés : les points de mesure et la droite modèle.\"\nleg = ax.get_legend()\nassert leg is not None, \"Il manque la légende : plt.legend().\"\ntextes = [t.get_text().lower() for t in leg.get_texts()]\nassert any(\"mesure\" in t for t in textes) and any(\"mod\" in t for t in textes), \"Les étiquettes attendues sont « mesures » et « modèle » (paramètre label=).\"\n"}]}, {"id": "m7", "titre": "Synthèse : méthode d'Euler", "duree": 8, "objectif": "Combiner boucle, tableaux et tracé pour résoudre une équation différentielle.", "intro": "<p>La charge d'un condensateur dans un circuit RC obéit à <i>du<\/i>/<i>dt<\/i> = (<i>E<\/i> − <i>u<\/i>) / τ. La <b>méthode d'Euler<\/b> avance par petits pas d<i>t<\/i> :<\/p>\n<p class=\"formule\"><i>u<\/i><sub><i>i<\/i>+1<\/sub> = <i>u<\/i><sub><i>i<\/i><\/sub> + d<i>t<\/i> × (<i>E<\/i> − <i>u<\/i><sub><i>i<\/i><\/sub>) / τ<\/p>\n<p>On compare ensuite à la solution exacte <i>u<\/i>(<i>t<\/i>) = <i>E<\/i>(1 − e<sup>−<i>t<\/i>/τ<\/sup>).<\/p>", "notions": [{"titre": "Le schéma d'une méthode d'Euler", "texte": "<p>Toujours la même structure : un tableau de temps, un tableau vide de même taille (<code>np.zeros<\/code>), la condition initiale, puis une boucle qui remplit la case <code>i + 1<\/code> à partir de la case <code>i<\/code>. Exemple : chute d'une bille freinée, <i>dv<\/i>/<i>dt<\/i> = <i>g<\/i> − (<i>k<\/i>/<i>m<\/i>) <i>v<\/i>.<\/p>", "code": "import numpy as np\nimport matplotlib.pyplot as plt\n\ng, k_m = 9.81, 2.0\ndt = 0.05\nt = np.arange(0, 3, dt)\nv = np.zeros(len(t))\nv[0] = 0\nfor i in range(len(t) - 1):\n    v[i + 1] = v[i] + dt * (g - k_m * v[i])\n\nplt.plot(t, v)\nplt.xlabel(\"t (s)\")\nplt.ylabel(\"v (m/s)\")\nplt.title(\"Vitesse limite : g / (k/m) = \" + str(round(g / k_m, 2)) + \" m/s\")\nplt.show()"}], "exercices": [{"id": "e71", "titre": "Charge d'un condensateur", "enonce": "<p>Complète la boucle pour remplir le tableau <code>u<\/code> par la méthode d'Euler (<i>E<\/i> = 5 V, τ = 0,5 s, d<i>t<\/i> = 0,01 s, <i>u<\/i>(0) = 0). Trace ensuite <code>u<\/code> et la solution exacte sur le même graphique, avec une légende.<\/p>", "depart": "import numpy as np\nimport matplotlib.pyplot as plt\n\nE, tau, dt = 5, 0.5, 0.01\nt = np.arange(0, 3, dt)\nu = np.zeros(len(t))\nu[0] = 0\nfor i in range(len(t) - 1):\n    u[i + 1] = ...\n\nplt.plot(t, u, label=\"Euler\")\nplt.plot(t, E * (1 - np.exp(-t / tau)), \"--\", label=\"exacte\")\nplt.xlabel(\"t (s)\")\nplt.ylabel(\"u (V)\")\nplt.legend()\nplt.show()\n", "solution": "import numpy as np\nimport matplotlib.pyplot as plt\n\nE, tau, dt = 5, 0.5, 0.01\nt = np.arange(0, 3, dt)\nu = np.zeros(len(t))\nu[0] = 0\nfor i in range(len(t) - 1):\n    u[i + 1] = u[i] + dt * (E - u[i]) / tau\n\nplt.plot(t, u, label=\"Euler\")\nplt.plot(t, E * (1 - np.exp(-t / tau)), \"--\", label=\"exacte\")\nplt.xlabel(\"t (s)\")\nplt.ylabel(\"u (V)\")\nplt.legend()\nplt.show()", "indice": "u[i + 1] = u[i] + dt * (E - u[i]) / tau", "test": "assert \"u\" in ns, \"Il faut le tableau u.\"\nu = np.asarray(ns[\"u\"], dtype=float)\nE, tau, dt = 5, 0.5, 0.01\nref = np.zeros(300)\nfor i in range(299):\n    ref[i + 1] = ref[i] + dt * (E - ref[i]) / tau\nassert u.shape == ref.shape, \"La taille de u a changé : garde t et u tels qu'ils sont donnés.\"\nassert u[1] != 0, \"u[1] vaut 0 : la boucle ne remplit pas encore le tableau.\"\nassert np.allclose(u, ref, atol=1e-9), \"Les valeurs de u ne suivent pas le schéma d'Euler. Vérifie : u[i] + dt * (E - u[i]) / tau.\"\nassert plt is not None and plt.get_fignums() and plt.gcf().axes and plt.gcf().axes[0].get_legend() is not None, \"Garde le tracé et la légende (plt.legend()).\"\n"}, {"id": "e72", "titre": "Pour aller plus loin : dichotomie", "bonus": true, "enonce": "<p>La fonction <i>f<\/i>(<i>x<\/i>) = <i>x<\/i>³ + <i>x<\/i> − 1 s'annule une seule fois sur [0 ; 1]. Écris <code>dichotomie(a, b, eps)<\/code> qui renvoie un encadrement <code>(a, b)<\/code> de cette racine d'amplitude inférieure ou égale à <code>eps<\/code>.<\/p>", "depart": "def f(x):\n    return x**3 + x - 1\n\ndef dichotomie(a, b, eps):\n    while b - a > eps:\n        m = (a + b) / 2\n        ...\n    return a, b\n\nprint(dichotomie(0, 1, 0.001))\n", "solution": "def f(x):\n    return x**3 + x - 1\n\ndef dichotomie(a, b, eps):\n    while b - a > eps:\n        m = (a + b) / 2\n        if f(a) * f(m) <= 0:\n            b = m\n        else:\n            a = m\n    return a, b\n\nprint(dichotomie(0, 1, 0.001))", "indice": "Si f(a) et f(m) sont de signes contraires (produit ≤ 0), la racine est dans [a ; m] : b = m. Sinon a = m.", "test": "assert \"dichotomie\" in ns and callable(ns[\"dichotomie\"]), \"Il faut définir la fonction dichotomie.\"\nr = 0.6823278038280193\nfor eps in [0.1, 0.001, 1e-6]:\n    res = ns[\"dichotomie\"](0, 1, eps)\n    assert isinstance(res, tuple) and len(res) == 2, \"dichotomie doit renvoyer le couple (a, b).\"\n    a, b = res\n    assert b - a <= eps + 1e-15, f\"Avec eps = {eps}, l'encadrement a une amplitude {b - a} trop grande.\"\n    assert a <= r <= b, f\"L'encadrement ({a}, {b}) ne contient pas la racine ≈ 0.6823.\"\n"}]}];
+const HARNESS = "import sys, io, time, json, base64, traceback\n\nclass _Delai(BaseException):\n    pass\n\ndef _traceur(limite):\n    t0 = time.perf_counter()\n    n = [0]\n    def tr(frame, event, arg):\n        n[0] += 1\n        if (n[0] & 1023) == 0 and time.perf_counter() - t0 > limite:\n            raise _Delai()\n        return tr\n    return tr\n\ndef proche(a, b, tol=1e-6):\n    try:\n        return abs(float(a) - float(b)) <= tol * max(1.0, abs(float(b)))\n    except Exception:\n        return False\n\ndef _ligne_eleve(tb):\n    lignes = [f.lineno for f in traceback.extract_tb(tb) if f.filename == \"<eleve>\"]\n    return lignes[-1] if lignes else None\n\ndef _figures(plt):\n    imgs = []\n    if plt is None:\n        return imgs\n    for num in plt.get_fignums():\n        fig = plt.figure(num)\n        b = io.BytesIO()\n        fig.savefig(b, format=\"png\", dpi=110, bbox_inches=\"tight\")\n        imgs.append(base64.b64encode(b.getvalue()).decode())\n    plt.close(\"all\")\n    return imgs\n\ndef executer(code, test=None, limite=5.0):\n    res = {\"sortie\": \"\", \"erreur\": None, \"type\": None, \"ligne\": None,\n           \"figures\": [], \"ok\": None, \"message\": \"\"}\n    ns = {\"__name__\": \"__main__\"}\n    plt = None\n    if \"matplotlib\" in code or \"plt\" in code:\n        try:\n            import matplotlib\n            matplotlib.use(\"Agg\")\n            import matplotlib.pyplot as plt\n            plt.close(\"all\")\n            plt.show = lambda *a, **k: None\n        except Exception:\n            plt = None\n    buf = io.StringIO()\n    old = sys.stdout, sys.stderr\n    sys.stdout = sys.stderr = buf\n    try:\n        comp = compile(code, \"<eleve>\", \"exec\")\n        sys.settrace(_traceur(limite))\n        try:\n            exec(comp, ns)\n        finally:\n            sys.settrace(None)\n    except _Delai:\n        res[\"type\"] = \"Delai\"\n        res[\"erreur\"] = f\"Arrêt automatique : le programme tourne depuis plus de {limite:g} s.\"\n    except SyntaxError as e:\n        res[\"type\"] = type(e).__name__\n        res[\"ligne\"] = e.lineno\n        res[\"erreur\"] = f\"{type(e).__name__}: {e.msg}\"\n    except Exception as e:\n        res[\"type\"] = type(e).__name__\n        res[\"ligne\"] = _ligne_eleve(e.__traceback__)\n        res[\"erreur\"] = f\"{type(e).__name__}: {e}\"\n    finally:\n        sys.settrace(None)\n        sys.stdout, sys.stderr = old\n    res[\"sortie\"] = buf.getvalue()[:20000]\n    if test is not None:\n        if res[\"erreur\"] is not None:\n            res[\"ok\"] = False\n            res[\"message\"] = \"Le programme s'arrête sur une erreur : corrige-la d'abord.\"\n        else:\n            env = {\"ns\": ns, \"sortie\": res[\"sortie\"], \"plt\": plt, \"proche\": proche}\n            trous = [k for k, v in ns.items() if v is Ellipsis]\n            try:\n                import numpy as np\n                env[\"np\"] = np\n            except Exception:\n                pass\n            sys.stdout = sys.stderr = io.StringIO()\n            try:\n                if trous:\n                    raise AssertionError(\"Remplace les ... par ton code (variable \" + \", \".join(trous) + \").\")\n                exec(test, env)\n                res[\"ok\"] = True\n            except AssertionError as e:\n                res[\"ok\"] = False\n                res[\"message\"] = str(e) or \"Pas encore : relis l'énoncé.\"\n            except Exception as e:\n                res[\"ok\"] = False\n                res[\"message\"] = f\"Vérification impossible ({type(e).__name__}: {e}). Relis l'énoncé : noms des variables et des fonctions.\"\n            finally:\n                sys.stdout, sys.stderr = old\n    try:\n        res[\"figures\"] = _figures(plt)\n    except Exception as e:\n        res[\"figures\"] = []\n    return json.dumps(res)\n";
+
+/* ---------- Données binaires de Python, publiées avec la page ---------- */
+const MANIFEST = {};
+const BUNDLE_OF = {};
+for (const [g, fs] of Object.entries(MANIFEST)) for (const f of fs) BUNDLE_OF[f] = g;
+const BUNDLES = {};
+const realFetch = window.fetch.bind(window);
+function b64ToBytes(s) { const bin = atob(s); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+function loadBundle(g) {
+  if (!BUNDLES[g]) BUNDLES[g] = realFetch('py/' + g + '.json').then(r => { if (!r.ok) throw new Error('paquet ' + g + ' : ' + r.status); return r.json(); });
+  return BUNDLES[g];
+}
+window.fetch = async (input, init) => {
+  const url = typeof input === 'string' ? input : (input && input.url) || String(input);
+  const name = url.split('?')[0].split('#')[0].split('/').pop();
+  const g = BUNDLE_OF[name];
+  if (g) { const d = await loadBundle(g); return new Response(b64ToBytes(d[name]), { status: 200, headers: { 'Content-Type': 'application/octet-stream' } }); }
+  return realFetch(input, init);
+};
+</script>
+<script src="py/pyodide.js"></script>
+<script>
+/* ---------- Petit stockage local (confort uniquement) ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('pyterm:' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('pyterm:' + k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem('pyterm:' + k); } catch (e) {} }
+};
+
+/* ---------- Python ---------- */
+const pill = document.getElementById('pyPill'), pyTxt = document.getElementById('pyTxt');
+function setPill(state, txt) { pill.className = 'pill ' + state; pyTxt.textContent = txt; }
+let py = null, executer = null;
+const pkgState = { numpy: null, matplotlib: null };
+
+const pyReady = (async () => {
+  const py_ = await loadPyodide({ indexURL: new URL('py/', location.href).href });
+  py_.runPython(HARNESS);
+  executer = py_.globals.get('executer');
+  py = py_;
+  setPill('ready', 'Python prêt');
+  return py_;
+})().catch(e => { setPill('fail', 'Python indisponible'); console.error(e); throw e; });
+
+function ensurePkg(name) {
+  if (!pkgState[name]) {
+    pkgState[name] = (async () => {
+      const p = await pyReady;
+      const deps = name === 'matplotlib' ? ['numpy', 'matplotlib'] : ['numpy'];
+      await p.loadPackage(deps, { messageCallback: () => {}, errorCallback: () => {} });
+      if (name === 'matplotlib') p.runPython("import matplotlib\nmatplotlib.use('Agg')\nimport matplotlib.pyplot");
+      else p.runPython('import numpy');
+    })();
+  }
+  return pkgState[name];
+}
+// Préchargement discret : numpy puis matplotlib, une fois Python prêt.
+pyReady.then(() => setTimeout(() => ensurePkg('numpy').then(() => ensurePkg('matplotlib')).catch(() => {}), 1500)).catch(() => {});
+
+async function run(code, test) {
+  await pyReady;
+  const needsPlt = /matplotlib|\bplt\b/.test(code);
+  const needsNp = needsPlt || /numpy|\bnp\b/.test(code) || (test && /\bnp\./.test(test) && /import numpy/.test(code));
+  if (needsPlt && !(await isDone('matplotlib'))) setPill('ready busy', 'Chargement de matplotlib…');
+  else if (needsNp && !(await isDone('numpy'))) setPill('ready busy', 'Chargement de numpy…');
+  if (needsPlt) await ensurePkg('matplotlib'); else if (needsNp) await ensurePkg('numpy');
+  setPill('ready busy', 'Exécution…');
+  await new Promise(r => setTimeout(r, 30));      // laisse l'interface se mettre à jour
+  try { return JSON.parse(executer(code, test === undefined ? null : test)); }
+  finally { setPill('ready', 'Python prêt'); }
+}
+async function isDone(name) {
+  if (!pkgState[name]) return false;
+  return Promise.race([pkgState[name].then(() => true, () => false), new Promise(r => setTimeout(() => r(false), 0))]);
+}
+
+/* ---------- Explications des erreurs ---------- */
+const ERR = {
+  SyntaxError: "Phrase Python mal construite. Vérifie les deux-points <code>:</code> après <code>def</code>, <code>if</code>, <code>for</code>, <code>while</code>, les parenthèses et les guillemets fermés.",
+  IndentationError: "Problème de décalage. Le bloc qui suit une ligne terminée par <code>:</code> doit être décalé de 4 espaces, toujours du même nombre.",
+  TabError: "Mélange de tabulations et d'espaces dans les décalages : utilise uniquement des espaces.",
+  NameError: "Python ne connaît pas ce nom. Variable pas encore définie, faute de frappe, ou majuscule oubliée ? Si c'est <code>np</code> ou <code>plt</code>, il manque la ligne <code>import</code>.",
+  UnboundLocalError: "Une variable est utilisée dans la fonction avant d'y recevoir une valeur.",
+  TypeError: "Opération entre types incompatibles (par exemple texte + nombre), ou mauvais nombre d'arguments donnés à une fonction.",
+  ZeroDivisionError: "Division par zéro.",
+  IndexError: "Indice hors de la liste : les indices vont de 0 à <code>len(L) - 1</code>.",
+  ValueError: "Valeur inadaptée. Avec matplotlib, c'est souvent que <code>x</code> et <code>y</code> n'ont pas la même taille.",
+  AttributeError: "Ce nom n'existe pas après le point. Vérifie l'orthographe (<code>np.linspace</code>, <code>plt.xlabel</code>…).",
+  ModuleNotFoundError: "Module inconnu : on utilise ici <code>numpy</code> et <code>matplotlib.pyplot</code>.",
+  ImportError: "Import impossible : vérifie l'orthographe du module.",
+  KeyError: "Clé absente du dictionnaire.",
+  OverflowError: "Nombre trop grand pour être calculé.",
+  RecursionError: "Une fonction s'appelle elle-même sans fin.",
+  Delai: "La boucle ne s'arrête jamais ? Dans un <code>while</code>, la condition doit finir par devenir fausse : la variable testée doit changer à chaque tour."
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ---------- Coloration syntaxique ---------- */
+const KW = 'def|return|if|elif|else|for|while|in|import|as|from|and|or|not|True|False|None|break|continue|pass|lambda|is|global|try|except|finally|with|class|del|assert|yield';
+const BI = 'print|len|range|sum|max|min|abs|round|int|float|str|bool|type|list|tuple|dict|sorted|enumerate|zip|input|np|plt|math|random';
+const TOK = new RegExp('(#.*$)|("""[\\s\\S]*?"""|\'\'\'[\\s\\S]*?\'\'\'|[fFrRbB]?"(?:\\\\.|[^"\\\\\\n])*"?|[fFrRbB]?\'(?:\\\\.|[^\'\\\\\\n])*\'?)|\\b(' + KW + ')\\b|\\b(' + BI + ')\\b|(\\b\\d+\\.?\\d*(?:[eE][+-]?\\d+)?\\b|\\.\\d+\\b)', 'gm');
+function highlight(src) {
+  let out = '', last = 0;
+  src.replace(TOK, (m, com, str, kw, bi, num, off) => {
+    out += esc(src.slice(last, off));
+    const cls = com ? 'com' : str ? 'str' : kw ? 'kw' : bi ? 'bi' : 'num';
+    out += '<span class="tk-' + cls + '">' + esc(m) + '</span>';
+    last = off + m.length; return m;
+  });
+  return out + esc(src.slice(last)) + '\n';
+}
+
+/* ---------- Éditeur ---------- */
+let saveTimers = {};
+function makeEditor(id, initial, opts = {}) {
+  const saved = opts.readonly ? null : store.get('code:' + id, null);
+  const wrap = document.createElement('div');
+  wrap.className = 'ed' + (opts.readonly ? ' ro' : '');
+  wrap.innerHTML = '<div class="gut" aria-hidden="true"></div><div class="area"><pre aria-hidden="true"></pre><textarea spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off"></textarea></div>';
+  const gut = wrap.querySelector('.gut'), pre = wrap.querySelector('pre'), ta = wrap.querySelector('textarea');
+  ta.id = 'ed-' + id;
+  ta.setAttribute('aria-label', opts.label || 'Éditeur de code Python');
+  ta.value = saved !== null ? saved : initial;
+  if (opts.readonly) ta.readOnly = true;
+  let errLine = null;
+  function refresh() {
+    pre.innerHTML = highlight(ta.value);
+    const n = ta.value.split('\n').length;
+    let g = '';
+    for (let i = 1; i <= n; i++) g += '<span' + (i === errLine ? ' class="err"' : '') + '>' + i + '</span>';
+    gut.innerHTML = g;
+    ta.style.height = 'auto';
+    ta.style.height = (ta.scrollHeight + (ta.scrollWidth > ta.clientWidth + 1 ? 14 : 0)) + 'px';
+    pre.scrollLeft = ta.scrollLeft;
+  }
+  ta.addEventListener('input', () => {
+    errLine = null; refresh();
+    if (!opts.readonly) { clearTimeout(saveTimers[id]); saveTimers[id] = setTimeout(() => store.set('code:' + id, ta.value), 400); }
+  });
+  ta.addEventListener('scroll', () => { pre.scrollLeft = ta.scrollLeft; });
+  ta.addEventListener('keydown', e => {
+    if (opts.readonly) return;
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); opts.onRun && opts.onRun(); return; }
+    if (e.key === 'Escape') { ta.blur(); return; }
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const s = ta.selectionStart, en = ta.selectionEnd, v = ta.value;
+      if (s !== en && v.slice(s, en).includes('\n') || e.shiftKey) {
+        const ls = v.lastIndexOf('\n', s - 1) + 1;
+        const block = v.slice(ls, en);
+        const nb = e.shiftKey ? block.replace(/^ {1,4}/gm, '') : block.replace(/^/gm, '    ');
+        ta.setSelectionRange(ls, en); insert(ta, nb);
+        ta.setSelectionRange(ls, ls + nb.length);
+      } else insert(ta, '    ');
+      return;
+    }
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const s = ta.selectionStart, v = ta.value;
+      const ls = v.lastIndexOf('\n', s - 1) + 1;
+      const line = v.slice(ls, s);
+      let ind = (line.match(/^ */) || [''])[0];
+      if (/:\s*(#.*)?$/.test(line)) ind += '    ';
+      e.preventDefault(); insert(ta, '\n' + ind);
+    }
+  });
+  function insert(t, text) {
+    t.focus();
+    if (!document.execCommand || !document.execCommand('insertText', false, text)) {
+      t.setRangeText(text, t.selectionStart, t.selectionEnd, 'end');
+      t.dispatchEvent(new Event('input'));
+    }
+  }
+  refresh();
+  requestAnimationFrame(refresh);
+  return {
+    el: wrap,
+    get value() { return ta.value; },
+    set value(v) { ta.value = v; refresh(); if (!opts.readonly) store.set('code:' + id, v); },
+    markError(line) { errLine = line; refresh(); },
+    refresh
+  };
+}
+
+/* ---------- Affichage des résultats ---------- */
+function renderResult(outEl, r, mode, editor) {
+  let h = '';
+  if (r.sortie) h += '<div class="lbl">Sortie</div><pre class="std">' + esc(r.sortie) + '</pre>';
+  for (const f of r.figures || []) h += '<div class="fig"><img alt="Figure produite par le programme" src="data:image/png;base64,' + f + '"></div>';
+  if (r.erreur) {
+    const where = r.ligne ? ' (ligne ' + r.ligne + ')' : '';
+    h += '<div class="msg err"><b>' + (r.type === 'Delai' ? 'Programme arrêté' : 'Erreur' + where) + '</b> : <code>' + esc(r.erreur) + '</code>' +
+         (ERR[r.type] ? '<span class="why">' + ERR[r.type] + '</span>' : '') + '</div>';
+    editor && editor.markError(r.ligne);
+  }
+  if (mode === 'check' && r.ok === true) h += '<div class="msg ok">✓ Exercice réussi.</div>';
+  if (mode === 'check' && r.ok === false && !r.erreur) h += '<div class="msg no"><b>Pas encore.</b> ' + esc(r.message) + '</div>';
+  if (!h) h = '<div class="muted">Le programme s\'est exécuté sans rien afficher. Ajoute un <code>print(...)</code> pour voir une valeur.</div>';
+  outEl.innerHTML = h;
+}
+
+/* ---------- Progression ---------- */
+const ALL_EX = DATA.flatMap(m => m.exercices.filter(e => !e.bonus).map(e => e.id));
+let done = new Set(store.get('done', []));
+function updateProgress() {
+  const n = ALL_EX.filter(id => done.has(id)).length;
+  document.getElementById('progTxt').innerHTML = n + '/' + ALL_EX.length + '<span class="lng"> exercices</span>';
+  document.getElementById('barFill').style.width = (100 * n / ALL_EX.length) + '%';
+  document.querySelectorAll('.step[data-mod]').forEach(b => {
+    const m = DATA.find(x => x.id === b.dataset.mod);
+    if (!m) return;
+    const ids = m.exercices.filter(e => !e.bonus).map(e => e.id);
+    b.classList.toggle('done', ids.length > 0 && ids.every(id => done.has(id)));
+    const sm = b.querySelector('small');
+    if (sm) sm.textContent = m.duree + ' min · ' + ids.filter(id => done.has(id)).length + '/' + ids.length;
+  });
+}
+
+/* ---------- Construction des pages ---------- */
+const steps = document.getElementById('steps'), main = document.getElementById('main');
+let t = 0;
+DATA.forEach((m, i) => {
+  const li = document.createElement('li');
+  li.innerHTML = '<button class="step" data-mod="' + m.id + '"><span class="t">' + t + '′</span><span class="tick"></span><span class="name">' + esc(m.titre) + '<small></small></span></button>';
+  steps.appendChild(li);
+  t += m.duree;
+});
+const endLi = document.createElement('li');
+endLi.className = 'end';
+endLi.innerHTML = '<button class="step" data-mod="bac"><span class="t">' + t + '′</span><span class="tick"></span><span class="name">Bac à sable<small>code libre</small></span></button>';
+steps.appendChild(endLi);
+steps.addEventListener('click', e => { const b = e.target.closest('.step'); if (b) show(b.dataset.mod, true); });
+
+function show(id, focus) {
+  if (id !== 'bac' && !DATA.find(m => m.id === id)) id = DATA[0].id;
+  store.set('mod', id);
+  document.querySelectorAll('.step').forEach(b => b.setAttribute('aria-current', b.dataset.mod === id ? 'true' : 'false'));
+  main.innerHTML = '';
+  if (id === 'bac') buildSandbox(); else buildModule(DATA.find(m => m.id === id));
+  if (history.replaceState) history.replaceState(null, '', '#' + id);
+  if (focus) { window.scrollTo({ top: 0 }); main.focus({ preventScroll: true }); }
+  const cur = document.querySelector('.step[aria-current="true"]');
+  cur && cur.scrollIntoView && cur.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+
+function buildModule(m) {
+  const idx = DATA.indexOf(m);
+  const start = DATA.slice(0, idx).reduce((a, x) => a + x.duree, 0);
+  const sec = document.createElement('section');
+  sec.innerHTML = '<div class="mod-head"><div class="eyebrow">Étape ' + idx + ' · ' + start + '′ → ' + (start + m.duree) + '′</div><h1>' + esc(m.titre) + '</h1><p class="objectif">' + m.objectif + '</p></div>';
+  if (idx === 0) {
+    const w = document.createElement('div'); w.className = 'welcome';
+    w.innerHTML = '<b>Comment se passe le parcours</b><ul><li>8 étapes, 1 h 30 en tout. La frise indique où tu devrais en être.</li><li>Lis la notion, lance les exemples, puis fais les exercices : ils se corrigent tout seuls.</li><li>Bloqué ? <b>Indice</b>, puis <b>Solution</b> si besoin. Tes réponses restent enregistrées dans ce navigateur.</li></ul>';
+    sec.appendChild(w);
+  }
+  const intro = document.createElement('div'); intro.className = 'prose'; intro.innerHTML = m.intro; sec.appendChild(intro);
+  if (m.notions.length) {
+    const h = document.createElement('h2'); h.className = 'sec'; h.textContent = 'À retenir'; sec.appendChild(h);
+    m.notions.forEach((n, k) => sec.appendChild(buildNotion(m, n, k)));
+  }
+  if (m.piege) {
+    const p = document.createElement('div'); p.className = 'piege';
+    p.innerHTML = '<b class="lab">Piège</b><div>' + m.piege + '</div>'; sec.appendChild(p);
+  }
+  const h2 = document.createElement('h2'); h2.className = 'sec'; h2.textContent = 'Exercices'; sec.appendChild(h2);
+  m.exercices.forEach((e, k) => sec.appendChild(buildExo(m, e, k)));
+  const nav = document.createElement('div'); nav.className = 'nav-mod';
+  const prev = DATA[idx - 1], next = DATA[idx + 1];
+  nav.innerHTML = (prev ? '<button class="btn" data-go="' + prev.id + '">← ' + esc(prev.titre) + '</button>' : '<span></span>') +
+                  (next ? '<button class="btn primary" data-go="' + next.id + '">' + esc(next.titre) + ' →</button>' : '<button class="btn primary" data-go="bac">Bac à sable →</button>');
+  nav.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) show(b.dataset.go, true); });
+  if (!next) {
+    const fin = document.createElement('div'); fin.className = 'fin'; fin.id = 'fin';
+    sec.appendChild(fin);
+  }
+  sec.appendChild(nav);
+  main.appendChild(sec);
+  refreshFin();
+}
+
+function refreshFin() {
+  const fin = document.getElementById('fin'); if (!fin) return;
+  const n = ALL_EX.filter(id => done.has(id)).length;
+  fin.innerHTML = n === ALL_EX.length
+    ? '<h2>Parcours terminé</h2><p>Les ' + n + ' exercices sont réussis : tu as couvert le Python attendu en terminale, des variables jusqu\'à la méthode d\'Euler. Garde le livret PDF comme aide-mémoire.</p>'
+    : '<h2 style="color:var(--ink)">Bilan</h2><p>' + n + ' exercice' + (n > 1 ? 's' : '') + ' réussi' + (n > 1 ? 's' : '') + ' sur ' + ALL_EX.length + '. Les étapes sans coche dans la frise ont encore un exercice à reprendre.</p>';
+}
+
+function buildNotion(m, n, k) {
+  const d = document.createElement('div'); d.className = 'notion';
+  d.innerHTML = '<h3>' + esc(n.titre) + '</h3><div class="prose">' + n.texte + '</div>';
+  const id = m.id + '-n' + k;
+  const out = document.createElement('div'); out.className = 'out'; out.setAttribute('aria-live', 'polite');
+  const ed = makeEditor(id, n.code, { onRun: go, label: 'Exemple : ' + n.titre });
+  const bar = document.createElement('div'); bar.className = 'bar-act';
+  bar.innerHTML = '<button class="btn primary" data-a="run">▶ Exécuter</button><button class="btn ghost" data-a="reset">Revenir à l\'exemple</button><span class="hint-k"><kbd>Ctrl</kbd>+<kbd>Entrée</kbd></span>';
+  async function go() {
+    const btn = bar.querySelector('[data-a="run"]'); btn.disabled = true;
+    out.innerHTML = '<div class="muted">Exécution…</div>';
+    try { renderResult(out, await run(ed.value), 'run', ed); }
+    catch (err) { out.innerHTML = '<div class="msg err"><b>Python n\'a pas pu démarrer.</b> Recharge la page ; si le problème persiste, vérifie ta connexion.</div>'; }
+    finally { btn.disabled = false; }
+  }
+  bar.addEventListener('click', e => {
+    const a = e.target.closest('[data-a]'); if (!a) return;
+    if (a.dataset.a === 'run') go();
+    if (a.dataset.a === 'reset') { ed.value = n.code; store.del('code:' + id); out.innerHTML = ''; }
+  });
+  d.append(ed.el, bar, out);
+  return d;
+}
+
+function buildExo(m, e, k) {
+  const d = document.createElement('article'); d.className = 'exo' + (done.has(e.id) ? ' done' : '');
+  const num = DATA.indexOf(m) + '.' + (k + 1);
+  d.innerHTML = '<div class="exo-h"><span class="num">Ex. ' + num + '</span><h3>' + esc(e.titre) + '</h3><span class="badge">' + (e.bonus ? 'bonus' : (done.has(e.id) ? '✓ réussi' : 'à faire')) + '</span></div><div class="enonce">' + e.enonce + '</div>';
+  const out = document.createElement('div'); out.className = 'out'; out.setAttribute('aria-live', 'polite');
+  const ed = makeEditor(e.id, e.depart, { onRun: () => go('check'), label: 'Ta réponse : ' + e.titre });
+  const bar = document.createElement('div'); bar.className = 'bar-act';
+  bar.innerHTML = '<button class="btn check" data-a="check">✓ Vérifier</button><button class="btn" data-a="run">▶ Exécuter</button><button class="btn ghost" data-a="hint">Indice</button><button class="btn ghost" data-a="sol">Solution</button><button class="btn ghost" data-a="reset">Recommencer</button><span class="hint-k"><kbd>Ctrl</kbd>+<kbd>Entrée</kbd> vérifie</span>';
+  const extra = document.createElement('div');
+  async function go(mode) {
+    bar.querySelectorAll('[data-a="check"],[data-a="run"]').forEach(b => b.disabled = true);
+    out.innerHTML = '<div class="muted">' + (mode === 'check' ? 'Vérification…' : 'Exécution…') + '</div>';
+    try {
+      const r = await run(ed.value, mode === 'check' ? e.test : undefined);
+      renderResult(out, r, mode, ed);
+      if (mode === 'check' && r.ok && !e.bonus) {
+        done.add(e.id); store.set('done', [...done]);
+        d.classList.add('done'); d.querySelector('.badge').textContent = '✓ réussi';
+        updateProgress(); refreshFin();
+      } else if (mode === 'check' && r.ok && e.bonus) {
+        d.classList.add('done'); d.querySelector('.badge').textContent = '✓ bonus réussi';
+      }
+    } catch (err) {
+      out.innerHTML = '<div class="msg err"><b>Python n\'a pas pu démarrer.</b> Recharge la page ; si le problème persiste, vérifie ta connexion.</div>';
+    } finally { bar.querySelectorAll('[data-a="check"],[data-a="run"]').forEach(b => b.disabled = false); }
+  }
+  bar.addEventListener('click', ev => {
+    const a = ev.target.closest('[data-a]'); if (!a) return;
+    const act = a.dataset.a;
+    if (act === 'check' || act === 'run') go(act);
+    if (act === 'reset') { ed.value = e.depart; store.del('code:' + e.id); out.innerHTML = ''; extra.innerHTML = ''; }
+    if (act === 'hint') {
+      if (extra.dataset.k === 'hint') { extra.innerHTML = ''; extra.dataset.k = ''; return; }
+      extra.dataset.k = 'hint';
+      extra.innerHTML = '<div class="reveal"><b>Indice.</b> ' + esc(e.indice) + '</div>';
+    }
+    if (act === 'sol') {
+      if (extra.dataset.k === 'sol') { extra.innerHTML = ''; extra.dataset.k = ''; return; }
+      extra.dataset.k = 'sol';
+      extra.innerHTML = '<div class="reveal"><b>Une solution possible.</b> Essaie de la comprendre, puis réécris-la à ta façon.<div class="sol-ed"></div><div class="bar-act"><button class="btn" data-copy>Mettre dans mon éditeur</button></div></div>';
+      const sed = makeEditor(e.id + '-sol', e.solution, { readonly: true, label: 'Solution : ' + e.titre });
+      extra.querySelector('.sol-ed').appendChild(sed.el);
+      extra.querySelector('[data-copy]').addEventListener('click', () => { ed.value = e.solution; extra.innerHTML = ''; extra.dataset.k = ''; });
+    }
+  });
+  d.append(ed.el, bar, extra, out);
+  return d;
+}
+
+function buildSandbox() {
+  const sec = document.createElement('section');
+  sec.innerHTML = '<div class="mod-head"><div class="eyebrow">Après le parcours</div><h1>Bac à sable</h1><p class="objectif">Un éditeur libre pour tester tes propres programmes : numpy et matplotlib fonctionnent ici aussi.</p></div>';
+  const code = 'import numpy as np\nimport matplotlib.pyplot as plt\n\n# Trajectoire d\'un projectile : modifie v0 et alpha\nv0, alpha, g = 12, 50, 9.81\na = np.radians(alpha)\nt = np.linspace(0, 2 * v0 * np.sin(a) / g, 100)\nx = v0 * np.cos(a) * t\ny = v0 * np.sin(a) * t - 0.5 * g * t**2\n\nplt.plot(x, y)\nplt.xlabel("x (m)")\nplt.ylabel("y (m)")\nplt.title(f"Portée : {x[-1]:.1f} m")\nplt.grid()\nplt.show()\n';
+  const out = document.createElement('div'); out.className = 'out'; out.setAttribute('aria-live', 'polite');
+  const ed = makeEditor('bac', code, { onRun: go, label: 'Bac à sable' });
+  const bar = document.createElement('div'); bar.className = 'bar-act';
+  bar.innerHTML = '<button class="btn primary" data-a="run">▶ Exécuter</button><button class="btn ghost" data-a="clear">Tout effacer</button><button class="btn ghost" data-a="reset">Exemple de départ</button><span class="hint-k"><kbd>Ctrl</kbd>+<kbd>Entrée</kbd></span>';
+  async function go() {
+    const btn = bar.querySelector('[data-a="run"]'); btn.disabled = true;
+    out.innerHTML = '<div class="muted">Exécution…</div>';
+    try { renderResult(out, await run(ed.value), 'run', ed); }
+    catch (err) { out.innerHTML = '<div class="msg err"><b>Python n\'a pas pu démarrer.</b> Recharge la page.</div>'; }
+    finally { btn.disabled = false; }
+  }
+  bar.addEventListener('click', e => {
+    const a = e.target.closest('[data-a]'); if (!a) return;
+    if (a.dataset.a === 'run') go();
+    if (a.dataset.a === 'clear') { ed.value = ''; out.innerHTML = ''; }
+    if (a.dataset.a === 'reset') { ed.value = code; out.innerHTML = ''; }
+  });
+  sec.append(ed.el, bar, out);
+  main.appendChild(sec);
+}
+
+updateProgress();
+const startId = (location.hash || '').slice(1) || store.get('mod', DATA[0].id);
+show(startId, false);
+updateProgress();
+</script>
+
+</html>
