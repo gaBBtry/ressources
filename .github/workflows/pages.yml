@@ -1,5 +1,5 @@
 # Workflow « Static HTML » proposé par GitHub (actions/starter-workflows, pages/static.yml),
-# avec un job de tests ajouté avant la publication : si un test échoue, rien n'est mis en ligne.
+# avec deux jobs de tests (unitaires et de bout en bout) ajoutés avant la publication : si un test échoue, rien n'est mis en ligne.
 # Actions épinglées par empreinte de commit (version entre parenthèses) pour un résultat reproductible.
 name: Deploy static content to Pages
 
@@ -36,8 +36,24 @@ jobs:
       - name: Run tests
         run: python -m unittest -v
 
+  e2e:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Run end-to-end test
+        run: npx playwright test
+
   deploy:
-    needs: test
+    needs: [test, e2e]
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
