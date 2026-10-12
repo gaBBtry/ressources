@@ -9,10 +9,27 @@ async function attendreResultat(bloc, bouton) {
 }
 
 test('parcours complet dans le navigateur', async ({ page }) => {
+  // Simuler GoatCounter sans contacter le service pendant le test.
+  const scriptGoatCounter = /^https?:\/\/gc\.zgo\.at\/count\.js$/;
+  await page.route(scriptGoatCounter, route => route.fulfill({
+    contentType: 'application/javascript',
+    body: '',
+  }));
+
   const problemes = [];
   page.on('pageerror', e => problemes.push('erreur JS : ' + e.message));
-  page.on('console', m => { if (m.type() === 'error') problemes.push('console : ' + m.text()); });
-  page.on('request', r => { if (new URL(r.url()).hostname !== '127.0.0.1' && !r.url().startsWith('data:')) problemes.push('requête externe : ' + r.url()); });
+  page.on('console', m => {
+    if (m.type() === 'error') problemes.push('console : ' + m.text());
+  });
+  page.on('request', r => {
+    if (
+      new URL(r.url()).hostname !== '127.0.0.1' &&
+      !r.url().startsWith('data:') &&
+      !scriptGoatCounter.test(r.url())
+    ) {
+      problemes.push('requête externe : ' + r.url());
+    }
+  });
 
   await page.goto('/python-lycee/');
   await expect(page.locator('#pyPill')).toHaveClass(/ready/);
